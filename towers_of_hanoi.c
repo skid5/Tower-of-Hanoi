@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUMBER_OF_DISKS 3
+#define NUMBER_OF_DISKS 4 //change this to change difficulty
 //linked list structure
 typedef struct node {
 	int data;
@@ -78,7 +78,7 @@ void print_towers(node_type *tower1, node_type *tower2, node_type *tower3) {
 
 void usage() {
 	printf("Usage: inputs 'r' 't' 'f' 'g' 'v' 'b'\n");
-	printf("Press:   r to move from tower1 to tower3\n\t t to move from tower1 to tower2\n\t f to move from tower2 to tower1\n\t g to move from tower2 to tower3\n\t v to move from tower3 to tower2\n\t b to move from tower3 to tower1\n");
+	printf("Press:   r to move from tower1 to tower3\n\t t to move from tower1 to tower2\n\t f to move from tower2 to tower1\n\t g to move from tower2 to tower3\n\t v to move from tower3 to tower2\n\t b to move from tower3 to tower1\n\t (q to quit)\n");
 }
 
 //returns true if first tower is empty and one of the others is also empty
@@ -86,10 +86,81 @@ void usage() {
 int win_condition(node_type *tower1, node_type *tower2, node_type *tower3) {
 	return (!tower1->data && (!tower2->data || !tower3->data));
 }
+
+//makes an ascii representation of game state
+//prints '-' to represent disks and '|' to represent empty space
+//towers are displayed vertically
+//(possible improvement would be to display them horizontally)
+void tower_visual(node_type *tower1, node_type *tower2, node_type *tower3) {
+	node_type *x = tower1;
+	node_type *y = tower2;
+	node_type *z = tower3;
+
+	int i;
+	int j;
+	
+	printf("Tower1\n");
+	printf("************************\n\n");
+	for(i=0; i < NUMBER_OF_DISKS; i++) {
+		if(x->next == NULL) {
+			for(i; i < NUMBER_OF_DISKS; i++) {
+				printf("|");
+				printf("\n");
+			}
+			break;
+		}
+		for(j=0; j<x->data; j++) {
+			printf("-");
+		}
+		printf("\n");
+		x = x->next;
+	}
+	printf("\n************************\n");
+
+	printf("Tower2\n");
+	printf("************************\n\n");
+	for(i=0; i < NUMBER_OF_DISKS; i++) {
+		if(y->next == NULL) {
+			for(i; i < NUMBER_OF_DISKS; i++) {
+				printf("|");
+				printf("\n");
+			}
+			break;
+		}
+		for(j=0; j<y->data; j++) {
+			printf("-");
+		}
+		printf("\n");
+		
+		y = y->next;
+	}
+	printf("\n************************\n");
+
+	printf("Tower3\n");
+	printf("************************\n\n");
+	for(i=0; i < NUMBER_OF_DISKS; i++) {
+		if(z->next == NULL) {
+			for(i; i < NUMBER_OF_DISKS; i++) {
+				printf("|");
+				printf("\n");
+			}
+			break;
+		}
+		for(j=0; j<z->data; j++) {
+			printf("-");
+		}
+		printf("\n");
+		
+		z = z->next;
+	}
+	printf("\n************************\n");
+}
+
 //loop that takes care of the game logic
 void game_loop(node_type **tower1, node_type **tower2, node_type **tower3) {
 	char c;
 	print_towers(*tower1,*tower2, *tower3);
+	tower_visual(*tower1,*tower2, *tower3);
 	for(;;) {
 		usage();
 		c = getchar();
@@ -113,10 +184,14 @@ void game_loop(node_type **tower1, node_type **tower2, node_type **tower3) {
 			case 'b' :
 				move(tower3, tower1);
 				break;
+			case 'q' :
+				printf("Thanks for playing\n");
+				exit(1);
 			default :
 				printf("\n");
 		}
 		print_towers(*tower1,*tower2, *tower3);
+		tower_visual(*tower1,*tower2, *tower3);
 		if(win_condition(*tower1, *tower2, *tower3)) {
 				printf("Gratz! You won!\n");
 				return;
